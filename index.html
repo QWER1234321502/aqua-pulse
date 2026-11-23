@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AQUA BLUE - 관상어 및 수조 용품 전문 쇼핑몰</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & Noto Sans KR -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Noto Sans KR', 'Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        ocean: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                            950: '#082f49',
+                        },
+                        aqua: {
+                            500: '#06b6d4',
+                            600: '#0891b2',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        html, body {
+            max-width: 100%;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+        @keyframes floatSlow {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-5px); }
+        }
+        .animate-float {
+            animation: floatSlow 3.2s ease-in-out infinite;
+        }
+        .hero-slide {
+            transition: opacity 0.9s ease-in-out, transform 6s ease-out;
+        }
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .toast-enter {
+            animation: slideInRight 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+    </style>
+</head>
+<body class="bg-ocean-50 text-slate-800 antialiased selection:bg-ocean-600 selection:text-white">
+
+    <!-- 토스트 알림 컨테이너 -->
+    <div id="toastContainer" class="fixed bottom-4 right-4 z-50 flex flex-col gap-2.5 max-w-xs sm:max-w-sm w-full pointer-events-none px-2 sm:px-0"></div>
+
+    <!-- 상단 네비게이션 바 -->
+    <header class="sticky top-0 z-40 bg-gradient-to-r from-ocean-700 via-ocean-600 to-aqua-500 text-white shadow-md">
+        <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+            <div class="flex flex-wrap items-center justify-between py-3 gap-2">
+                <!-- 브랜드 로고 -->
+                <a href="#top" class="flex items-center gap-2 group">
+                    <div class="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30">
+                        <span class="text-xl animate-float">🐠</span>
+                    </div>
+                    <div>
+                        <span class="text-lg sm:text-xl font-black tracking-tight text-white">AQUA BLUE</span>
+                        <span class="hidden sm:block text-[10px] text-ocean-100 font-semibold tracking-wider">AQUARIUM &amp; SUPPLIES</span>
+                    </div>
+                </a>
+
+                <!-- 메뉴 링크 -->
+                <nav class="flex items-center gap-3 sm:gap-7 text-xs sm:text-sm font-bold text-white/95">
+                    <a href="#catalog-section" class="hover:text-ocean-100 transition-colors py-1">상품 목록</a>
+                    <a href="#cart-section" class="hover:text-ocean-100 transition-colors py-1 flex items-center gap-1">
+                        장바구니
+                        <span id="navCartCount" class="px-1.5 py-0.5 text-[11px] bg-white text-ocean-700 font-black rounded-full">0</span>
+                    </a>
+                    <a href="#member-section" class="hover:text-ocean-100 transition-colors py-1">회원·마이페이지</a>
+                </nav>
+
+                <!-- 사용자 상태 영역 -->
+                <div id="userStatusArea" class="flex items-center gap-2"></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 1. 메인 히어로 슬라이드 배너 (실사 4장, 6초마다 자동 교차) -->
+    <section id="top" class="relative w-full h-[380px] sm:h-[460px] overflow-hidden bg-ocean-950">
+        <div id="sliderWrapper" class="relative w-full h-full">
+            <!-- 슬라이드 1 -->
+            <div class="hero-slide absolute inset-0 opacity-100 scale-100" data-index="0">
+                <img data-local-src="./img/slide-1.jpg"
+                     src="https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?auto=format&fit=crop&w=1600&q=85"
+                     alt="맑은 바다빛 수조 속 열대어" class="w-full h-full object-cover object-center">
+                <div class="absolute inset-0 bg-gradient-to-r from-ocean-950/85 via-ocean-900/55 to-transparent flex items-center">
+                    <div class="max-w-7xl mx-auto px-5 sm:px-10 w-full">
+                        <div class="max-w-lg space-y-3">
+                            <span class="inline-block px-3 py-1 rounded-full bg-aqua-500/25 border border-cyan-300/40 text-cyan-100 text-xs font-bold">
+                                🌊 수조 속 작은 바다, AQUA BLUE
+                            </span>
+                            <h1 class="text-2xl sm:text-4xl font-black text-white leading-tight">
+                                건강한 관상어와<br>검증된 수조 용품 전문몰
+                            </h1>
+                            <p class="text-xs sm:text-base text-ocean-100 leading-relaxed">
+                                열대어부터 해수어, 여과·조명, 수질관리 용품까지 어종별 적정 수온과 재고를 확인하고 한 번에 담아보세요.
+                            </p>
+                            <div class="pt-1 flex flex-wrap gap-2.5">
+                                <a href="#catalog-section" class="px-5 py-2.5 rounded-xl bg-ocean-600 hover:bg-ocean-500 text-white text-xs sm:text-sm font-bold shadow-lg transition-all">
+                                    상품 둘러보기
+                                </a>
+                                <a href="#member-section" class="px-5 py-2.5 rounded-xl bg-white/15 hover:bg-white/25 backdrop-blur-sm border border-white/30 text-white text-xs sm:text-sm font-semibold transition-all">
+                                    가입하고 3,000P 받기
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 슬라이드 2 -->
+            <div class="hero-slide absolute inset-0 opacity-0 scale-105 pointer-events-none" data-index="1">
+                <img data-local-src="./img/slide-2.jpg"
+                     src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1600&q=85"
+                     alt="산호와 해수어 수조" class="w-full h-full object-cover object-center">
+                <div class="absolute inset-0 bg-gradient-to-r from-ocean-950/85 via-ocean-900/55 to-transparent flex items-center">
+                    <div class="max-w-7xl mx-auto px-5 sm:px-10 w-full">
+                        <div class="max-w-lg space-y-3">
+                            <span class="inline-block px-3 py-1 rounded-full bg-ocean-500/30 border border-sky-300/40 text-sky-100 text-xs font-bold">
+                                🪸 선명한 빛깔의 해수어 컬렉션
+                            </span>
+                            <h2 class="text-2xl sm:text-4xl font-black text-white leading-tight">
+                                산호초의 보석을 닮은<br>인기 해수어 라인업
+                            </h2>
+                            <p class="text-xs sm:text-base text-ocean-100 leading-relaxed">
+                                오셀라리스 클라운피쉬와 블루 탱 등 수조의 중심이 되어주는 건강한 해수어를 만나보세요.
+                            </p>
+                            <div class="pt-1">
+                                <a href="#catalog-section" class="inline-block px-5 py-2.5 rounded-xl bg-aqua-500 hover:bg-aqua-600 text-white text-xs sm:text-sm font-bold shadow-lg transition-all">
+                                    해수어 보기
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 슬라이드 3 -->
+            <div class="hero-slide absolute inset-0 opacity-0 scale-105 pointer-events-none" data-index="2">
+                <img data-local-src="./img/slide-3.jpg"
+                     src="https://images.unsplash.com/photo-1535591273668-578e31182c4f?auto=format&fit=crop&w=1600&q=85"
+                     alt="우아한 지느러미의 블루 베타" class="w-full h-full object-cover object-center">
+                <div class="absolute inset-0 bg-gradient-to-r from-ocean-950/85 via-ocean-900/55 to-transparent flex items-center">
+                    <div class="max-w-7xl mx-auto px-5 sm:px-10 w-full">
+                        <div class="max-w-lg space-y-3">
+                            <span class="inline-block px-3 py-1 rounded-full bg-cyan-500/25 border border-cyan-300/40 text-cyan-100 text-xs font-bold">
+                                🌿 입문자 추천 담수 열대어
+                            </span>
+                            <h2 class="text-2xl sm:text-4xl font-black text-white leading-tight">
+                                적정 수온과 상세 가이드로<br>쉬운 수조 생활 시작
+                            </h2>
+                            <p class="text-xs sm:text-base text-ocean-100 leading-relaxed">
+                                상품 카드를 클릭하면 어종별 적정 수온, 사육 특징, 실시간 재고 수량을 바로 확인할 수 있습니다.
+                            </p>
+                            <div class="pt-1">
+                                <a href="#catalog-section" class="inline-block px-5 py-2.5 rounded-xl bg-ocean-600 hover:bg-ocean-500 text-white text-xs sm:text-sm font-bold shadow-lg transition-all">
+                                    열대어 살펴보기
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 슬라이드 4 -->
+            <div class="hero-slide absolute inset-0 opacity-0 scale-105 pointer-events-none" data-index="3">
+                <img data-local-src="./img/slide-4.jpg"
+                     src="https://images.unsplash.com/photo-1516683037151-9a17603a8dc7?auto=format&fit=crop&w=1600&q=85"
+                     alt="푸른 바다빛 관상어" class="w-full h-full object-cover object-center">
+                <div class="absolute inset-0 bg-gradient-to-r from-ocean-950/85 via-ocean-900/55 to-transparent flex items-center">
+                    <div class="max-w-7xl mx-auto px-5 sm:px-10 w-full">
+                        <div class="max-w-lg space-y-3">
+                            <span class="inline-block px-3 py-1 rounded-full bg-teal-500/25 border border-teal-300/40 text-teal-100 text-xs font-bold">
+                                💎 AQUA BLUE 멤버십 리워드
+                            </span>
+                            <h2 class="text-2xl sm:text-4xl font-black text-white leading-tight">
+                                신규 가입 3,000P 지급 &amp;<br>등급별 1% ~ 7% 적립
+                            </h2>
+                            <p class="text-xs sm:text-base text-ocean-100 leading-relaxed">
+                                브론즈(1%) · 실버(3%) · 골드(5%) · 다이아(7%) 등급에 따라 포인트가 적립되고 결제 시 자유롭게 사용할 수 있습니다.
+                            </p>
+                            <div class="pt-1">
+                                <a href="#member-section" class="inline-block px-5 py-2.5 rounded-xl bg-aqua-500 hover:bg-aqua-600 text-white text-xs sm:text-sm font-bold shadow-lg transition-all">
+                                    멤버십 혜택 보기
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 좌우 수동 컨트롤 버튼 -->
+        <button type="button" onclick="prevSlide()" aria-label="이전 슬라이드" class="absolute left-2.5 sm:left-5 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-ocean-950/50 hover:bg-ocean-950/80 backdrop-blur-sm text-white flex items-center justify-center transition-all border border-white/25">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+        </button>
+        <button type="button" onclick="nextSlide()" aria-label="다음 슬라이드" class="absolute right-2.5 sm:right-5 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-ocean-950/50 hover:bg-ocean-950/80 backdrop-blur-sm text-white flex items-center justify-center transition-all border border-white/25">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+        </button>
+
+        <!-- 하단 점 인디케이터 (4개) -->
+        <div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 z-20" id="sliderDotsContainer">
+            <button type="button" onclick="goToSlide(0)" class="slider-dot w-7 h-2.5 rounded-full bg-aqua-500 transition-all" aria-label="슬라이드 1"></button>
+            <button type="button" onclick="goToSlide(1)" class="slider-dot w-2.5 h-2.5 rounded-full bg-white/50 hover:bg-white transition-all" aria-label="슬라이드 2"></button>
+            <button type="button" onclick="goToSlide(2)" class="slider-dot w-2.5 h-2.5 rounded-full bg-white/50 hover:bg-white transition-all" aria-label="슬라이드 3"></button>
+            <button type="button" onclick="goToSlide(3)" class="slider-dot w-2.5 h-2.5 rounded-full bg-white/50 hover:bg-white transition-all" aria-label="슬라이드 4"></button>
+        </div>
+    </section>
+
+    <!-- 메인 콘텐츠 래퍼 -->
+    <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-8 space-y-10">
+
+        <!-- 2. 상품 목록 · 검색 · 분류 필터 · 상품 상세 -->
+        <section id="catalog-section" class="bg-white rounded-3xl shadow-sm border border-ocean-100 p-4 sm:p-7">
+            <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-4 pb-5 border-b border-ocean-100">
+                <div>
+                    <span class="text-[11px] font-extrabold tracking-widest text-ocean-600 uppercase">AQUA BLUE CATALOG</span>
+                    <h2 class="text-xl sm:text-2xl font-black text-ocean-950 mt-0.5">관상어 및 수조 용품 목록</h2>
+                    <p class="text-xs sm:text-sm text-slate-500 mt-1">카드를 클릭하면 아래 상세 패널에서 적정 수온과 상세 설명을 확인할 수 있습니다.</p>
+                </div>
+
+                <!-- 실시간 키워드 검색 & 분류 필터 -->
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 w-full lg:w-auto">
+                    <div class="relative flex-1 sm:w-60">
+                        <input type="search" id="searchInput" placeholder="어종 또는 용품 검색..."
+                               class="w-full pl-9 pr-3 py-2 rounded-xl border border-ocean-200 focus:border-ocean-600 focus:ring-2 focus:ring-ocean-100 outline-none text-sm bg-ocean-50/40">
+                        <svg class="w-4 h-4 text-ocean-600 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 103.5 10.5a7.5 7.5 0 0013.15 6.15z"/>
+                        </svg>
+                    </div>
+                    <div id="categoryFilterBar" class="flex flex-wrap gap-1.5"></div>
+                </div>
+            </div>
+
+            <!-- 상품 카드 그리드 (8개 상품) -->
+            <div id="productGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 mt-6"></div>
+
+            <!-- 상품 상세 정보 패널 -->
+            <div id="productDetailPanel" class="mt-6 rounded-2xl bg-gradient-to-r from-ocean-50 to-cyan-50/60 border border-ocean-200 p-4 sm:p-6">
+                <!-- JS로 렌더링 -->
+            </div>
+        </section>
+
+        <!-- 3. 장바구니 & 체험 결제 -->
+        <section id="cart-section" class="bg-white rounded-3xl shadow-sm border border-ocean-100 p-4 sm:p-7">
+            <div class="flex flex-wrap items-center justify-between gap-2 pb-4 border-b border-ocean-100">
+                <div>
+                    <span class="text-[11px] font-extrabold tracking-widest text-aqua-600 uppercase">CART &amp; DEMO CHECKOUT</span>
+                    <h2 class="text-xl sm:text-2xl font-black text-ocean-950 mt-0.5">장바구니 및 체험 결제</h2>
+                </div>
+                <span id="cartCountBadge" class="px-3 py-1 rounded-full bg-ocean-100 text-ocean-800 text-xs font-extrabold">
+                    담긴 상품 0개
+                </span>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-5">
+                <!-- 장바구니 아이템 목록 -->
+                <div class="lg:col-span-2 space-y-3" id="cartListContainer"></div>
+
+                <!-- 합계 및 체험 결제 폼 -->
+                <form id="checkoutForm" class="rounded-2xl bg-ocean-50/80 border border-ocean-200 p-4 sm:p-5 flex flex-col justify-between space-y-4">
+                    <div class="space-y-3 text-sm">
+                        <h3 class="font-extrabold text-ocean-950 text-base pb-2 border-b border-ocean-200">결제 예정 내역</h3>
+
+                        <div class="flex justify-between text-slate-600">
+                            <span>상품 총 합계</span>
+                            <strong id="cartSubtotalText" class="text-slate-900">0원</strong>
+                        </div>
+
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs font-bold text-ocean-700">
+                                <label for="usePointsInput">보유 포인트 사용</label>
+                                <span>사용 가능: <span id="availPointsText">0</span>P</span>
+                            </div>
+                            <div class="flex gap-1.5">
+                                <input type="number" id="usePointsInput" min="0" step="100" value="0"
+                                       class="w-full px-3 py-2 rounded-xl border border-ocean-200 bg-white text-sm outline-none focus:border-ocean-600">
+                                <button type="button" onclick="applyAllPoints()"
+                                        class="px-3 py-2 rounded-xl bg-ocean-200/70 hover:bg-ocean-200 text-ocean-900 text-xs font-bold whitespace-nowrap">
+                                    전액
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between text-xs text-aqua-600 font-bold bg-white px-3 py-2 rounded-xl border border-ocean-100">
+                            <span>예상 적립 포인트</span>
+                            <span id="expectedEarnText">0P (1%)</span>
+                        </div>
+
+                        <div class="pt-2 border-t border-ocean-200 flex justify-between items-center">
+                            <span class="font-bold text-ocean-950">최종 체험 결제액</span>
+                            <strong id="finalPayText" class="text-xl font-black text-ocean-600">0원</strong>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-ocean-600 to-aqua-500 hover:from-ocean-700 hover:to-aqua-600 text-white font-extrabold text-sm shadow-md transition-all">
+                        체험 결제하기
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- 4. 회원가입 · 로그인 · 마이페이지 · 등급 안내 -->
+        <section id="member-section" class="bg-white rounded-3xl shadow-sm border border-ocean-100 p-4 sm:p-7">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-4 border-b border-ocean-100">
+                <div>
+                    <span class="text-[11px] font-extrabold tracking-widest text-ocean-600 uppercase">MEMBERSHIP &amp; MYPAGE</span>
+                    <h2 class="text-xl sm:text-2xl font-black text-ocean-950 mt-0.5">회원 · 마이페이지</h2>
+                </div>
+                <!-- 4단계 등급 적립률 안내 -->
+                <div id="tierLegendBar" class="flex flex-wrap gap-1.5"></div>
+            </div>
+
+            <!-- 비로그인 상태: 깔끔한 로그인 / 회원가입 폼 -->
+            <div id="authFormsWrapper" class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5">
+                <form id="loginForm" class="rounded-2xl bg-ocean-50/60 border border-ocean-100 p-5 space-y-3">
+                    <h3 class="text-base font-extrabold text-ocean-950">로그인</h3>
+                    <div>
+                        <label for="loginIdInput" class="block text-xs font-bold text-slate-700 mb-1">아이디</label>
+                        <input type="text" id="loginIdInput" required placeholder="아이디를 입력하세요"
+                               class="w-full px-3.5 py-2.5 rounded-xl border border-ocean-200 bg-white text-sm outline-none focus:border-ocean-600">
+                    </div>
+                    <div>
+                        <label for="loginPwInput" class="block text-xs font-bold text-slate-700 mb-1">비밀번호</label>
+                        <input type="password" id="loginPwInput" required placeholder="비밀번호를 입력하세요"
+                               class="w-full px-3.5 py-2.5 rounded-xl border border-ocean-200 bg-white text-sm outline-none focus:border-ocean-600">
+                    </div>
+                    <button type="submit" class="w-full py-2.5 rounded-xl bg-ocean-600 hover:bg-ocean-700 text-white font-bold text-sm transition-colors">
+                        로그인
+                    </button>
+                </form>
+
+                <form id="signupForm" class="rounded-2xl bg-cyan-50/50 border border-cyan-200/80 p-5 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-base font-extrabold text-ocean-950">회원가입</h3>
+                        <span class="px-2.5 py-0.5 rounded-full bg-aqua-500 text-white text-[11px] font-bold">가입 즉시 3,000P 지급</span>
+                    </div>
+                    <div>
+                        <label for="signupNameInput" class="block text-xs font-bold text-slate-700 mb-1">이름</label>
+                        <input type="text" id="signupNameInput" required placeholder="이름을 입력하세요"
+                               class="w-full px-3.5 py-2.5 rounded-xl border border-ocean-200 bg-white text-sm outline-none focus:border-ocean-600">
+                    </div>
+                    <div>
+                        <label for="signupIdInput" class="block text-xs font-bold text-slate-700 mb-1">아이디</label>
+                        <input type="text" id="signupIdInput" required placeholder="사용할 아이디를 입력하세요"
+                               class="w-full px-3.5 py-2.5 rounded-xl border border-ocean-200 bg-white text-sm outline-none focus:border-ocean-600">
+                    </div>
+                    <div>
+                        <label for="signupPwInput" class="block text-xs font-bold text-slate-700 mb-1">비밀번호</label>
+                        <input type="password" id="signupPwInput" required placeholder="비밀번호를 입력하세요"
+                               class="w-full px-3.5 py-2.5 rounded-xl border border-ocean-200 bg-white text-sm outline-none focus:border-ocean-600">
+                    </div>
+                    <button type="submit" class="w-full py-2.5 rounded-xl bg-aqua-500 hover:bg-aqua-600 text-white font-bold text-sm transition-colors">
+                        가입하고 3,000P 받기
+                    </button>
+                </form>
+            </div>
+
+            <!-- 로그인 상태: 마이페이지 대시보드 & 체험 주문 내역 -->
+            <div id="mypageWrapper" class="hidden mt-5 space-y-5">
+                <div class="flex flex-wrap items-center justify-between gap-3 bg-ocean-50 rounded-2xl p-4 border border-ocean-200">
+                    <div>
+                        <h3 id="mypageUserTitle" class="text-lg font-black text-ocean-950">회원 마이페이지</h3>
+                        <p id="mypageUserSub" class="text-xs text-slate-600 mt-0.5"></p>
+                    </div>
+                    <button type="button" onclick="logoutMember()" class="px-4 py-2 rounded-xl bg-white hover:bg-rose-50 text-rose-600 border border-rose-200 text-xs font-bold transition-colors">
+                        로그아웃
+                    </button>
+                </div>
+
+                <!-- 4대 핵심 지표 -->
+                <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+                    <div class="rounded-2xl bg-ocean-50/70 border border-ocean-100 p-4">
+                        <span class="text-xs text-slate-500 block">현재 등급</span>
+                        <strong id="statTier" class="text-lg font-black text-ocean-700 mt-1 block">-</strong>
+                    </div>
+                    <div class="rounded-2xl bg-ocean-50/70 border border-ocean-100 p-4">
+                        <span class="text-xs text-slate-500 block">포인트 적립률</span>
+                        <strong id="statRate" class="text-lg font-black text-aqua-600 mt-1 block">-</strong>
+                    </div>
+                    <div class="rounded-2xl bg-ocean-50/70 border border-ocean-100 p-4">
+                        <span class="text-xs text-slate-500 block">보유 포인트</span>
+                        <strong id="statPoints" class="text-lg font-black text-ocean-700 mt-1 block">0P</strong>
+                    </div>
+                    <div class="rounded-2xl bg-ocean-50/70 border border-ocean-100 p-4">
+                        <span class="text-xs text-slate-500 block">누적 체험 결제액</span>
+                        <strong id="statSpent" class="text-lg font-black text-slate-900 mt-1 block">0원</strong>
+                    </div>
+                </div>
+
+                <!-- 체험 주문 내역 -->
+                <div>
+                    <h4 class="text-sm font-extrabold text-ocean-950 mb-2.5">체험 주문 내역</h4>
+                    <div id="orderHistoryList" class="space-y-2.5"></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 푸터 -->
+    <footer class="bg-ocean-950 text-ocean-200 mt-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-7 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs">
+            <strong class="text-white text-sm font-black">AQUA BLUE</strong>
+            <span>관상어 및 수조 용품 전문 쇼핑몰 · 바다 블루 &amp; 시안 아쿠아 에디션</span>
+        </div>
+    </footer>
+
+    <script>
+        /* =========================================================================
+           1. 데이터베이스 연동 대비 마스터 데이터 (PRODUCTS & MEMBER_TIERS)
+           ========================================================================= */
+        const PRODUCTS = [
+            {
+                id: 1,
+                name: "네온 테트라 (5마리)",
+                category: "열대어",
+                price: 12000,
+                stock: 30,
+                temp: "22~26℃",
+                localImage: "./img/fish-1.jpg",
+                image: "https://images.unsplash.com/photo-1522069169874-c58ec4b76be5?auto=format&fit=crop&w=800&q=80",
+                desc: "푸른빛과 붉은빛 라인이 선명한 대표 군영 열대어로 수초 수조에 잘 어울립니다."
+            },
+            {
+                id: 2,
+                name: "알비노 풀레드 구피 (1쌍)",
+                category: "열대어",
+                price: 15000,
+                stock: 25,
+                temp: "23~27℃",
+                localImage: "./img/fish-2.jpg",
+                image: "https://images.unsplash.com/photo-1524704654690-b56c05c78a00?auto=format&fit=crop&w=800&q=80",
+                desc: "환경 적응력이 뛰어나 입문자도 사육하기 좋으며 화려한 꼬리지느러미가 특징입니다."
+            },
+            {
+                id: 3,
+                name: "오셀라리스 클라운피쉬",
+                category: "해수어",
+                price: 28000,
+                stock: 15,
+                temp: "24~27℃",
+                localImage: "./img/fish-3.jpg",
+                image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=800&q=80",
+                desc: "선명한 주황색과 흰 줄무늬가 조화로운 인기 해수어로 해수 입문 수조에 적합합니다."
+            },
+            {
+                id: 4,
+                name: "블루 탱",
+                category: "해수어",
+                price: 52000,
+                stock: 10,
+                temp: "24~26℃",
+                localImage: "./img/fish-4.jpg",
+                image: "https://images.unsplash.com/photo-1516683037151-9a17603a8dc7?auto=format&fit=crop&w=800&q=80",
+                desc: "깊은 바다를 닮은 로얄 블루 바디와 노란 꼬리가 대비되는 중대형 해수 관상어입니다."
+            },
+            {
+                id: 5,
+                name: "하프문 블루 베타",
+                category: "열대어",
+                price: 18000,
+                stock: 18,
+                temp: "24~28℃",
+                localImage: "./img/fish-5.jpg",
+                image: "https://images.unsplash.com/photo-1535591273668-578e31182c4f?auto=format&fit=crop&w=800&q=80",
+                desc: "반달처럼 넓게 펼쳐지는 푸른 지느러미가 매력적이며 단독 소형 수조에서 키우기 좋습니다."
+            },
+            {
+                id: 6,
+                name: "블루 담셀피쉬",
+                category: "해수어",
+                price: 16000,
+                stock: 22,
+                temp: "24~27℃",
+                localImage: "./img/fish-6.jpg",
+                image: "https://images.unsplash.com/photo-1520301255226-bf5f144451c1?auto=format&fit=crop&w=800&q=80",
+                desc: "맑고 투명한 코발트 블루 빛깔을 지닌 활기찬 소형 해수어입니다."
+            },
+            {
+                id: 7,
+                name: "아쿠아 스펀지 여과기 & LED 세트",
+                category: "여과·조명",
+                price: 24000,
+                stock: 32,
+                temp: "전 수온",
+                localImage: "./img/gear-7.jpg",
+                image: "https://images.unsplash.com/photo-1504472478235-9bc48ba4d60f?auto=format&fit=crop&w=800&q=80",
+                desc: "생물학적 여과를 돕는 스펀지 여과기와 수조 색감을 살리는 클립형 LED 조명 구성입니다."
+            },
+            {
+                id: 8,
+                name: "프리미엄 플레이크 사료 & 수질 안정제",
+                category: "사료·수질관리",
+                price: 14500,
+                stock: 40,
+                temp: "전 수온",
+                localImage: "./img/gear-8.jpg",
+                image: "https://images.unsplash.com/photo-1583212292454-1fe6229603b7?auto=format&fit=crop&w=800&q=80",
+                desc: "관상어 일상 급여용 균형 영양 사료와 수돗물 염소를 중화하는 수질 컨디셔너 세트입니다."
+            }
+        ];
+
+        const MEMBER_TIERS = [
+            { code: "BRONZE", name: "브론즈", minSpent: 0, earnRate: 0.01 },
+            { code: "SILVER", name: "실버", minSpent: 50000, earnRate: 0.03 },
+            { code: "GOLD", name: "골드", minSpent: 150000, earnRate: 0.05 },
+            { code: "DIAMOND", name: "다이아", minSpent: 300000, earnRate: 0.07 }
+        ];
+
+        const CATEGORIES = ["전체", "열대어", "해수어", "여과·조명", "사료·수질관리"];
+        const SIGNUP_BONUS_POINTS = 3000;
+        const STORAGE_KEY = "aqua_blue_mall_state_v4";
+
+        /* =========================================================================
+           2. 상태 관리 (localStorage 영속화)
+           ========================================================================= */
+        function createInitialState() {
+            return {
+                members: [],
+                currentMemberId: null,
+                cart: [],
+                selectedCategory: "전체",
+                searchKeyword: "",
+                selectedProductId: 1,
+                stockMap: PRODUCTS.reduce((acc, p) => {
+                    acc[p.id] = p.stock;
+                    return acc;
+                }, {})
+            };
+        }
+
+        function loadState() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (!raw) return createInitialState();
+                const parsed = JSON.parse(raw);
+                const base = createInitialState();
+                return {
+                    ...base,
+                    ...parsed,
+                    members: Array.isArray(parsed.members) ? parsed.members : [],
+                    cart: Array.isArray(parsed.cart) ? parsed.cart : [],
+                    stockMap: { ...base.stockMap, ...(parsed.stockMap || {}) }
+                };
+            } catch (err) {
+                return createInitialState();
+            }
+        }
+
+        let state = loadState();
+
+        function saveState() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            } catch (err) {
+                // 스토리지 제한 환경 예외 처리
+            }
+        }
+
+        function getProductStock(productId) {
+            if (typeof state.stockMap[productId] === "number") {
+                return state.stockMap[productId];
+            }
+            const found = PRODUCTS.find(p => p.id === productId);
+            return found ? found.stock : 0;
+        }
+
+        function getCurrentMember() {
+            if (!state.currentMemberId) return null;
+            return state.members.find(m => m.id === state.currentMemberId) || null;
+        }
+
+        function getTierBySpent(totalSpent) {
+            let current = MEMBER_TIERS[0];
+            for (const tier of MEMBER_TIERS) {
+                if (totalSpent >= tier.minSpent) {
+                    current = tier;
+                }
+            }
+            return current;
+        }
+
+        function formatWon(value) {
+            return `${Number(value).toLocaleString("ko-KR")}원`;
+        }
+
+        function formatPt(value) {
+            return `${Number(value).toLocaleString("ko-KR")}P`;
+        }
+
+        /* =========================================================================
+           3. 로컬 ./img/ 우선 로드 & 고화질 실사 폴백 로직
+           ========================================================================= */
+        function applyLocalImagePriority() {
+            document.querySelectorAll("img[data-local-src]").forEach(img => {
+                if (img.dataset.checkedLocal === "true") return;
+                img.dataset.checkedLocal = "true";
+
+                const localSrc = img.getAttribute("data-local-src");
+                const remoteSrc = img.getAttribute("src");
+                if (!localSrc) return;
+
+                const tester = new Image();
+                tester.onload = () => {
+                    img.src = localSrc;
+                };
+                tester.onerror = () => {
+                    img.src = remoteSrc;
+                };
+                tester.src = localSrc;
+            });
+        }
+
+        /* =========================================================================
+           4. 토스트 알림 (alert 미사용)
+           ========================================================================= */
+        function showToast(title, message, variant = "info") {
+            const container = document.getElementById("toastContainer");
+            const toast = document.createElement("div");
+
+            const borderStyle = {
+                info: "border-ocean-600",
+                success: "border-aqua-500",
+                warning: "border-amber-500"
+            }[variant] || "border-ocean-600";
+
+            const icon = {
+                info: "🌊",
+                success: "✨",
+                warning: "🐠"
+            }[variant] || "🌊";
+
+            toast.className = `toast-enter pointer-events-auto bg-white rounded-2xl shadow-lg border border-ocean-100 border-l-4 ${borderStyle} p-3.5 flex items-start gap-2.5`;
+            toast.innerHTML = `
+                <span class="text-lg leading-none mt-0.5">${icon}</span>
+                <div class="flex-1 min-w-0">
+                    <h4 class="text-xs font-extrabold text-slate-900">${title}</h4>
+                    <p class="text-xs text-slate-600 mt-0.5 leading-snug break-words">${message}</p>
+                </div>
+                <button type="button" onclick="this.parentElement.remove()" class="text-slate-400 hover:text-slate-600 text-xs font-bold">✕</button>
+            `;
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    toast.style.opacity = "0";
+                    toast.style.transition = "opacity 0.25s ease";
+                    setTimeout(() => toast.remove(), 250);
+                }
+            }, 3800);
+        }
+
+        /* =========================================================================
+           5. 첫 화면 슬라이드 (4장, 6초마다 자동 교차 + 수동 조작)
+           ========================================================================= */
+        let currentSlide = 0;
+        const slideElements = document.querySelectorAll(".hero-slide");
+        const dotElements = document.querySelectorAll(".slider-dot");
+        let slideTimer = setInterval(nextSlide, 6000);
+
+        function renderSlider() {
+            slideElements.forEach((slide, idx) => {
+                if (idx === currentSlide) {
+                    slide.classList.remove("opacity-0", "scale-105", "pointer-events-none");
+                    slide.classList.add("opacity-100", "scale-100");
+                } else {
+                    slide.classList.remove("opacity-100", "scale-100");
+                    slide.classList.add("opacity-0", "scale-105", "pointer-events-none");
+                }
+            });
+
+            dotElements.forEach((dot, idx) => {
+                if (idx === currentSlide) {
+                    dot.classList.remove("w-2.5", "bg-white/50");
+                    dot.classList.add("w-7", "bg-aqua-500");
+                } else {
+                    dot.classList.remove("w-7", "bg-aqua-500");
+                    dot.classList.add("w-2.5", "bg-white/50");
+                }
+            });
+        }
+
+        function goToSlide(index) {
+            currentSlide = (index + slideElements.length) % slideElements.length;
+            renderSlider();
+            resetSlideTimer();
+        }
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % slideElements.length;
+            renderSlider();
+        }
+
+        function prevSlide() {
+            currentSlide = (currentSlide - 1 + slideElements.length) % slideElements.length;
+            renderSlider();
+            resetSlideTimer();
+        }
+
+        function resetSlideTimer() {
+            clearInterval(slideTimer);
+            slideTimer = setInterval(nextSlide, 6000);
+        }
+
+        /* =========================================================================
+           6. 상품 목록 · 검색 · 분류 필터 · 상품 상세 패널
+           ========================================================================= */
+        function renderCategoryFilters() {
+            const bar = document.getElementById("categoryFilterBar");
+            bar.innerHTML = CATEGORIES.map(cat => {
+                const isActive = state.selectedCategory === cat;
+                return `
+                    <button type="button" onclick="selectCategory('${cat}')"
+                            class="px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                                isActive
+                                    ? "bg-ocean-600 text-white shadow-sm"
+                                    : "bg-ocean-50 text-ocean-800 border border-ocean-200 hover:bg-ocean-100"
+                            }">
+                        ${cat}
+                    </button>
+                `;
+            }).join("");
+        }
+
+        function selectCategory(category) {
+            state.selectedCategory = category;
+            saveState();
+            renderCategoryFilters();
+            renderProductGrid();
+        }
+
+        function getFilteredProducts() {
+            const kw = state.searchKeyword.trim().toLowerCase();
+            return PRODUCTS.filter(p => {
+                const matchCat = state.selectedCategory === "전체" || p.category === state.selectedCategory;
+                const matchKw =
+                    !kw ||
+                    p.name.toLowerCase().includes(kw) ||
+                    p.category.toLowerCase().includes(kw) ||
+                    p.desc.toLowerCase().includes(kw);
+                return matchCat && matchKw;
+            });
+        }
+
+        function renderProductGrid() {
+            const grid = document.getElementById("productGrid");
+            const filtered = getFilteredProducts();
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-10 rounded-2xl bg-ocean-50/70 border border-dashed border-ocean-200">
+                        <p class="text-sm font-bold text-ocean-900">검색 조건에 맞는 상품이 없습니다.</p>
+                        <p class="text-xs text-slate-500 mt-1">다른 검색어나 분류를 선택해 보세요.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(product => {
+                const stock = getProductStock(product.id);
+                const isSelected = state.selectedProductId === product.id;
+
+                return `
+                    <article onclick="selectProductDetail(${product.id})"
+                             class="cursor-pointer group rounded-2xl bg-white border ${
+                                 isSelected ? "border-ocean-600 ring-2 ring-ocean-200" : "border-ocean-100"
+                             } overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+                        <div>
+                            <div class="relative h-40 bg-ocean-100 overflow-hidden">
+                                <img data-local-src="${product.localImage}"
+                                     src="${product.image}"
+                                     alt="${product.name}"
+                                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                                <span class="absolute top-2.5 left-2.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-ocean-950/75 text-cyan-100 backdrop-blur-xs">
+                                    ${product.category}
+                                </span>
+                                ${stock === 0 ? `
+                                    <div class="absolute inset-0 bg-slate-900/60 flex items-center justify-center">
+                                        <span class="px-3 py-1 rounded-full bg-rose-600 text-white text-xs font-extrabold">품절</span>
+                                    </div>
+                                ` : ""}
+                            </div>
+
+                            <div class="p-3.5">
+                                <h3 class="text-sm font-extrabold text-ocean-950 group-hover:text-ocean-600 transition-colors line-clamp-1">
+                                    ${product.name}
+                                </h3>
+                                <div class="flex items-center justify-between mt-2 text-xs">
+                                    <span class="font-black text-base text-ocean-700">${formatWon(product.price)}</span>
+                                    <span class="px-2 py-0.5 rounded-md bg-ocean-50 text-ocean-800 font-semibold">재고 ${stock}개</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="px-3.5 pb-3.5 pt-1 flex gap-2" onclick="event.stopPropagation()">
+                            <button type="button" onclick="selectProductDetail(${product.id})"
+                                    class="flex-1 py-2 rounded-xl border border-ocean-200 hover:bg-ocean-50 text-ocean-800 text-xs font-bold transition-colors">
+                                상세
+                            </button>
+                            <button type="button" onclick="addToCart(${product.id})" ${stock < 1 ? "disabled" : ""}
+                                    class="flex-1 py-2 rounded-xl ${
+                                        stock < 1
+                                            ? "bg-slate-200 text-slate-400 cursor-not-allowed"
+                                            : "bg-ocean-600 hover:bg-ocean-700 text-white"
+                                    } text-xs font-bold transition-colors">
+                                ${stock < 1 ? "품절" : "담기"}
+                            </button>
+                        </div>
+                    </article>
+                `;
+            }).join("");
+
+            applyLocalImagePriority();
+        }
+
+        function selectProductDetail(productId) {
+            state.selectedProductId = productId;
+            saveState();
+            renderProductGrid();
+            renderProductDetail();
+        }
+
+        function renderProductDetail() {
+            const panel = document.getElementById("productDetailPanel");
+            const product = PRODUCTS.find(p => p.id === state.selectedProductId) || PRODUCTS[0];
+            if (!product) return;
+
+            const stock = getProductStock(product.id);
+            panel.innerHTML = `
+                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6">
+                    <img data-local-src="${product.localImage}"
+                         src="${product.image}"
+                         alt="${product.name}"
+                         class="w-full sm:w-48 h-36 object-cover rounded-xl border border-ocean-200 bg-white shrink-0">
+                    <div class="flex-1 space-y-2">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="px-2.5 py-0.5 rounded-full bg-ocean-600 text-white text-[11px] font-bold">${product.category}</span>
+                            <span class="px-2.5 py-0.5 rounded-full bg-white text-ocean-800 border border-ocean-200 text-[11px] font-bold">🌡️ 적정 수온 ${product.temp}</span>
+                            <span class="px-2.5 py-0.5 rounded-full bg-white text-slate-700 border border-ocean-200 text-[11px] font-bold">📦 남은 재고 ${stock}개</span>
+                        </div>
+                        <h3 class="text-lg font-black text-ocean-950">${product.name}</h3>
+                        <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">${product.desc}</p>
+                        <div class="pt-1 flex flex-wrap items-center justify-between gap-3">
+                            <span class="text-lg font-black text-ocean-700">${formatWon(product.price)}</span>
+                            <button type="button" onclick="addToCart(${product.id})" ${stock < 1 ? "disabled" : ""}
+                                    class="px-5 py-2.5 rounded-xl ${
+                                        stock < 1
+                                            ? "bg-slate-300 text-slate-500 cursor-not-allowed"
+                                            : "bg-gradient-to-r from-ocean-600 to-aqua-500 hover:from-ocean-700 hover:to-aqua-600 text-white shadow-sm"
+                                    } text-xs sm:text-sm font-extrabold transition-all">
+                                ${stock < 1 ? "품절된 상품입니다" : "장바구니에 담기"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            applyLocalImagePriority();
+        }
+
+        /* =========================================================================
+           7. 장바구니 (수량 증감 · 삭제 · 합계) & 체험 결제
+           ========================================================================= */
+        function addToCart(productId) {
+            const product = PRODUCTS.find(p => p.id === productId);
+            const stock = getProductStock(productId);
+            if (!product || stock < 1) return;
+
+            const existing = state.cart.find(item => item.productId === productId);
+            if (existing) {
+                if (existing.qty >= stock) {
+                    showToast("재고 한도 안내", `현재 남은 재고(${stock}개) 이상 담을 수 없습니다.`, "warning");
+                    return;
+                }
+                existing.qty += 1;
+            } else {
+                state.cart.push({ productId, qty: 1 });
+            }
+
+            saveState();
+            renderCart();
+            showToast("장바구니 담기 완료", `[${product.name}] 상품이 장바구니에 추가되었습니다.`, "success");
+        }
+
+        function changeCartQty(productId, delta) {
+            const stock = getProductStock(productId);
+            const item = state.cart.find(c => c.productId === productId);
+            if (!item) return;
+
+            const nextQty = item.qty + delta;
+            if (nextQty <= 0) {
+                removeCartItem(productId);
+                return;
+            }
+            if (nextQty > stock) {
+                showToast("재고 한도 안내", `최대 ${stock}개까지 주문할 수 있습니다.`, "warning");
+                return;
+            }
+
+            item.qty = nextQty;
+            saveState();
+            renderCart();
+        }
+
+        function removeCartItem(productId) {
+            state.cart = state.cart.filter(c => c.productId !== productId);
+            saveState();
+            renderCart();
+        }
+
+        function getCartSubtotal() {
+            return state.cart.reduce((sum, item) => {
+                const product = PRODUCTS.find(p => p.id === item.productId);
+                return product ? sum + product.price * item.qty : sum;
+            }, 0);
+        }
+
+        function renderCart() {
+            const container = document.getElementById("cartListContainer");
+            const navBadge = document.getElementById("navCartCount");
+            const sectionBadge = document.getElementById("cartCountBadge");
+
+            const totalQty = state.cart.reduce((sum, item) => sum + item.qty, 0);
+            navBadge.textContent = String(totalQty);
+            sectionBadge.textContent = `담긴 상품 ${totalQty}개`;
+
+            if (state.cart.length === 0) {
+                container.innerHTML = `
+                    <div class="h-full min-h-[160px] flex flex-col items-center justify-center text-center p-6 rounded-2xl bg-ocean-50/50 border border-dashed border-ocean-200">
+                        <span class="text-2xl mb-1.5">🛒</span>
+                        <p class="text-sm font-bold text-ocean-900">장바구니가 비어 있습니다.</p>
+                        <p class="text-xs text-slate-500 mt-1">위 상품 목록에서 원하는 관상어나 용품을 담아보세요.</p>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = state.cart.map(item => {
+                    const product = PRODUCTS.find(p => p.id === item.productId);
+                    if (!product) return "";
+                    const lineTotal = product.price * item.qty;
+
+                    return `
+                        <div class="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-2xl bg-ocean-50/50 border border-ocean-100">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <img data-local-src="${product.localImage}"
+                                     src="${product.image}"
+                                     alt="${product.name}"
+                                     class="w-14 h-14 rounded-xl object-cover border border-ocean-200 shrink-0">
+                                <div class="min-w-0">
+                                    <span class="text-[11px] font-bold text-ocean-600">${product.category}</span>
+                                    <h4 class="text-sm font-extrabold text-ocean-950 truncate">${product.name}</h4>
+                                    <p class="text-xs text-slate-600 mt-0.5">${formatWon(product.price)} × ${item.qty} = <strong class="text-ocean-700">${formatWon(lineTotal)}</strong></p>
+                                </div>
+                            </div>
+
+                            <div class="flex items-center gap-1.5 ml-auto">
+                                <button type="button" onclick="changeCartQty(${product.id}, -1)" aria-label="수량 줄이기"
+                                        class="w-7 h-7 rounded-lg bg-white border border-ocean-200 hover:bg-ocean-100 text-ocean-900 font-extrabold text-sm">
+                                    -
+                                </button>
+                                <span class="w-7 text-center text-xs font-extrabold text-slate-900">${item.qty}</span>
+                                <button type="button" onclick="changeCartQty(${product.id}, 1)" aria-label="수량 늘리기"
+                                        class="w-7 h-7 rounded-lg bg-white border border-ocean-200 hover:bg-ocean-100 text-ocean-900 font-extrabold text-sm">
+                                    +
+                                </button>
+                                <button type="button" onclick="removeCartItem(${product.id})"
+                                        class="ml-1.5 px-2.5 py-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 text-xs font-bold">
+                                    삭제
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join("");
+
+                applyLocalImagePriority();
+            }
+
+            renderCheckoutSummary();
+        }
+
+        function applyAllPoints() {
+            const member = getCurrentMember();
+            if (!member) {
+                showToast("로그인 필요", "포인트를 사용하려면 먼저 로그인해 주세요.", "warning");
+                return;
+            }
+            const subtotal = getCartSubtotal();
+            const maxUsable = Math.min(member.points, subtotal);
+            document.getElementById("usePointsInput").value = String(maxUsable);
+            renderCheckoutSummary();
+        }
+
+        function renderCheckoutSummary() {
+            const member = getCurrentMember();
+            const subtotal = getCartSubtotal();
+            const availPoints = member ? member.points : 0;
+            const tier = member ? getTierBySpent(member.totalSpent) : MEMBER_TIERS[0];
+
+            const useInput = document.getElementById("usePointsInput");
+            let usedPoints = parseInt(useInput.value, 10) || 0;
+            if (usedPoints < 0) usedPoints = 0;
+            if (usedPoints > availPoints) usedPoints = availPoints;
+            if (usedPoints > subtotal) usedPoints = subtotal;
+            useInput.value = String(usedPoints);
+
+            const finalPay = Math.max(0, subtotal - usedPoints);
+            const expectedEarn = member ? Math.floor(finalPay * tier.earnRate) : 0;
+
+            document.getElementById("cartSubtotalText").textContent = formatWon(subtotal);
+            document.getElementById("availPointsText").textContent = Number(availPoints).toLocaleString("ko-KR");
+            document.getElementById("expectedEarnText").textContent = `${formatPt(expectedEarn)} (${tier.name} ${Math.round(tier.earnRate * 100)}%)`;
+            document.getElementById("finalPayText").textContent = formatWon(finalPay);
+        }
+
+        function handleCheckoutSubmit(event) {
+            event.preventDefault();
+            const member = getCurrentMember();
+            if (!member) {
+                showToast("로그인 필요", "체험 결제를 진행하려면 먼저 로그인 또는 회원가입해 주세요.", "warning");
+                document.getElementById("member-section").scrollIntoView({ behavior: "smooth" });
+                return;
+            }
+            if (state.cart.length === 0) {
+                showToast("장바구니 비어 있음", "결제할 상품을 먼저 장바구니에 담아주세요.", "warning");
+                return;
+            }
+
+            const subtotal = getCartSubtotal();
+            const useInput = document.getElementById("usePointsInput");
+            let usedPoints = parseInt(useInput.value, 10) || 0;
+            if (usedPoints < 0) usedPoints = 0;
+            if (usedPoints > member.points) usedPoints = member.points;
+            if (usedPoints > subtotal) usedPoints = subtotal;
+
+            const finalPay = Math.max(0, subtotal - usedPoints);
+            const tierBefore = getTierBySpent(member.totalSpent);
+            const earnedPoints = Math.floor(finalPay * tierBefore.earnRate);
+
+            // 재고 차감
+            for (const cartItem of state.cart) {
+                const currentStock = getProductStock(cartItem.productId);
+                state.stockMap[cartItem.productId] = Math.max(0, currentStock - cartItem.qty);
+            }
+
+            // 회원 포인트 및 누적 체험 결제액 갱신
+            member.points = member.points - usedPoints + earnedPoints;
+            member.totalSpent += finalPay;
+            const tierAfter = getTierBySpent(member.totalSpent);
+
+            const orderItems = state.cart.map(c => {
+                const prod = PRODUCTS.find(p => p.id === c.productId);
+                return {
+                    name: prod ? prod.name : `상품 #${c.productId}`,
+                    qty: c.qty,
+                    price: prod ? prod.price : 0
+                };
+            });
+
+            member.orders.unshift({
+                orderId: `ORD-${Date.now()}`,
+                orderedAt: new Date().toLocaleString("ko-KR"),
+                items: orderItems,
+                subtotal,
+                usedPoints,
+                finalPay,
+                earnedPoints,
+                tierName: tierAfter.name
+            });
+
+            state.cart = [];
+            useInput.value = "0";
+            saveState();
+
+            renderProductGrid();
+            renderProductDetail();
+            renderCart();
+            renderAuthAndMypage();
+
+            const upgradeText = tierAfter.code !== tierBefore.code ? ` [${tierAfter.name}] 등급으로 승급되었습니다!` : "";
+            showToast("체험 결제 완료", `주문 내역이 저장되었으며 ${formatPt(earnedPoints)}가 적립되었습니다.${upgradeText}`, "success");
+        }
+
+        /* =========================================================================
+           8. 회원가입 · 로그인 · 마이페이지 · 4단계 등급 UI
+           ========================================================================= */
+        function renderTierLegend() {
+            const bar = document.getElementById("tierLegendBar");
+            bar.innerHTML = MEMBER_TIERS.map(t => `
+                <span class="px-2.5 py-1 rounded-lg bg-ocean-50 border border-ocean-200 text-ocean-800 text-[11px] font-bold">
+                    ${t.name} ${Math.round(t.earnRate * 100)}%
+                </span>
+            `).join("");
+        }
+
+        function handleSignup(event) {
+            event.preventDefault();
+            const name = document.getElementById("signupNameInput").value.trim();
+            const id = document.getElementById("signupIdInput").value.trim();
+            const pw = document.getElementById("signupPwInput").value;
+
+            if (!name || !id || !pw) return;
+
+            if (state.members.some(m => m.id === id)) {
+                showToast("중복된 아이디", "이미 등록된 아이디입니다. 다른 아이디를 입력해 주세요.", "warning");
+                return;
+            }
+
+            const newMember = {
+                id,
+                password: pw,
+                name,
+                points: SIGNUP_BONUS_POINTS,
+                totalSpent: 0,
+                orders: []
+            };
+
+            state.members.push(newMember);
+            state.currentMemberId = id;
+            saveState();
+
+            event.target.reset();
+            renderAuthAndMypage();
+            renderCheckoutSummary();
+            showToast("회원가입 완료", `${name}님 환영합니다! 가입 축하 포인트 ${formatPt(SIGNUP_BONUS_POINTS)}가 즉시 지급되었습니다.`, "success");
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const id = document.getElementById("loginIdInput").value.trim();
+            const pw = document.getElementById("loginPwInput").value;
+
+            const matched = state.members.find(m => m.id === id && m.password === pw);
+            if (!matched) {
+                showToast("로그인 실패", "아이디 또는 비밀번호가 일치하지 않습니다. 신규 회원은 오른쪽에서 가입해 주세요.", "warning");
+                return;
+            }
+
+            state.currentMemberId = matched.id;
+            saveState();
+
+            event.target.reset();
+            renderAuthAndMypage();
+            renderCheckoutSummary();
+            showToast("로그인 성공", `${matched.name}님 반갑습니다!`, "success");
+        }
+
+        function logoutMember() {
+            state.currentMemberId = null;
+            saveState();
+            renderAuthAndMypage();
+            renderCheckoutSummary();
+            showToast("로그아웃", "안전하게 로그아웃되었습니다.", "info");
+        }
+
+        function renderAuthAndMypage() {
+            const member = getCurrentMember();
+            const headerArea = document.getElementById("userStatusArea");
+            const authWrapper = document.getElementById("authFormsWrapper");
+            const mypageWrapper = document.getElementById("mypageWrapper");
+
+            if (!member) {
+                headerArea.innerHTML = `
+                    <a href="#member-section" class="px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 border border-white/30 text-white text-xs font-bold transition-colors">
+                        로그인 / 가입
+                    </a>
+                `;
+                authWrapper.classList.remove("hidden");
+                mypageWrapper.classList.add("hidden");
+                return;
+            }
+
+            const tier = getTierBySpent(member.totalSpent);
+            headerArea.innerHTML = `
+                <div class="flex items-center gap-1.5 bg-ocean-950/35 border border-white/20 px-2.5 py-1 rounded-xl text-xs">
+                    <span class="px-1.5 py-0.5 rounded-md bg-white text-ocean-700 font-black">${tier.name}</span>
+                    <span class="font-bold hidden sm:inline">${member.name}님</span>
+                    <span class="font-extrabold text-cyan-200">${formatPt(member.points)}</span>
+                </div>
+            `;
+
+            authWrapper.classList.add("hidden");
+            mypageWrapper.classList.remove("hidden");
+
+            document.getElementById("mypageUserTitle").textContent = `${member.name} (${member.id})님의 마이페이지`;
+            document.getElementById("mypageUserSub").textContent =
+                `현재 [${tier.name}] 등급으로 체험 결제 금액의 ${Math.round(tier.earnRate * 100)}%가 포인트로 적립됩니다.`;
+
+            document.getElementById("statTier").textContent = tier.name;
+            document.getElementById("statRate").textContent = `${Math.round(tier.earnRate * 100)}%`;
+            document.getElementById("statPoints").textContent = formatPt(member.points);
+            document.getElementById("statSpent").textContent = formatWon(member.totalSpent);
+
+            const orderListEl = document.getElementById("orderHistoryList");
+            if (!member.orders || member.orders.length === 0) {
+                orderListEl.innerHTML = `
+                    <div class="p-4 rounded-2xl bg-ocean-50/50 border border-dashed border-ocean-200 text-center text-xs text-slate-500">
+                        아직 체험 주문 내역이 없습니다. 장바구니에서 체험 결제를 진행해 보세요.
+                    </div>
+                `;
+            } else {
+                orderListEl.innerHTML = member.orders.map(order => `
+                    <div class="p-3.5 rounded-2xl bg-ocean-50/60 border border-ocean-100 text-xs space-y-1">
+                        <div class="flex flex-wrap items-center justify-between gap-2">
+                            <strong class="text-ocean-900">${order.orderId}</strong>
+                            <span class="text-slate-500">${order.orderedAt} · 등급 ${order.tierName}</span>
+                        </div>
+                        <p class="text-slate-700">
+                            주문 상품: ${order.items.map(i => `${i.name} (${i.qty}개)`).join(", ")}
+                        </p>
+                        <p class="font-bold text-ocean-700">
+                            최종 체험 결제: ${formatWon(order.finalPay)} (포인트 사용 ${formatPt(order.usedPoints)} · 적립 ${formatPt(order.earnedPoints)})
+                        </p>
+                    </div>
+                `).join("");
+            }
+        }
+
+        /* =========================================================================
+           9. 초기화 및 이벤트 연결
+           ========================================================================= */
+        document.addEventListener("DOMContentLoaded", () => {
+            renderTierLegend();
+            renderSlider();
+            renderCategoryFilters();
+            renderProductGrid();
+            renderProductDetail();
+            renderCart();
+            renderAuthAndMypage();
+            applyLocalImagePriority();
+
+            document.getElementById("searchInput").addEventListener("input", (e) => {
+                state.searchKeyword = e.target.value;
+                renderProductGrid();
+            });
+
+            document.getElementById("usePointsInput").addEventListener("input", renderCheckoutSummary);
+            document.getElementById("checkoutForm").addEventListener("submit", handleCheckoutSubmit);
+            document.getElementById("signupForm").addEventListener("submit", handleSignup);
+            document.getElementById("loginForm").addEventListener("submit", handleLogin);
+        });
+    </script>
+</body>
+</html>
