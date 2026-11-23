@@ -6,6 +6,8 @@
     <title>AQUA BLUE - 관상어 및 수조 용품 전문 쇼핑몰</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Supabase JS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- Google Fonts: Inter & Noto Sans KR -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
     <script>
@@ -533,6 +535,40 @@
 
         const CATEGORIES = ["전체", "열대어", "해수어", "여과·조명", "사료·수질관리"];
         const SIGNUP_BONUS_POINTS = 3000;
+
+        /* =========================================================================
+           1-1. Supabase 연결 (회원 · 주문을 DB에 저장)
+           ========================================================================= */
+        const SUPABASE_URL = "https://yzuwisnkdhjsqfmkpnnb.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_FdV8yIRZ1JTL_mfzqULcKA_qazQbGie";
+        const sb = (window.supabase && window.supabase.createClient)
+            ? window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY)
+            : null;
+
+        async function hashPw(pw) {
+            const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode("aquablue:" + pw));
+            return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
+        }
+
+        function rowToMember(row, orderRows) {
+            return {
+                id: row.login_id,
+                password: row.password_hash,
+                name: row.name,
+                points: row.points,
+                totalSpent: row.total_spent,
+                orders: (orderRows || []).map(o => ({
+                    orderId: o.order_id,
+                    orderedAt: o.ordered_at,
+                    items: o.items,
+                    subtotal: o.subtotal,
+                    usedPoints: o.used_points,
+                    finalPay: o.final_pay,
+                    earnedPoints: o.earned_points,
+                    tierName: o.tier_name
+                }))
+            };
+        }
         const STORAGE_KEY = "aqua_blue_mall_state_v4";
 
         /* =========================================================================
@@ -1035,6 +1071,30 @@
             document.getElementById("finalPayText").textContent = formatWon(finalPay);
         }
 
+        async function saveOrderToDb(member, order, gradeName) {
+            if (!sb) return;
+            const { error: orderErr } = await sb.from("shop_orders").insert({
+                order_id: order.orderId,
+                login_id: member.id,
+                items: order.items,
+                subtotal: order.subtotal,
+                used_points: order.usedPoints,
+                final_pay: order.finalPay,
+                earned_points: order.earnedPoints,
+                tier_name: order.tierName,
+                ordered_at: order.orderedAt
+            });
+            const { error: memErr } = await sb.from("shop_members").update({
+                points: member.points,
+                total_spent: member.totalSpent,
+                grade: gradeName
+            }).eq("login_id", member.id);
+            if (orderErr || memErr) {
+                console.error("주문 DB 저장 오류:", orderErr, memErr);
+                showToast("DB 저장 오류", "주문은 처리됐지만 DB 저장에 실패했습니다. 콘솔(F12)을 확인해 주세요.", "warning");
+            }
+        }
+
         function handleCheckoutSubmit(event) {
             event.preventDefault();
             const member = getCurrentMember();
@@ -1079,7 +1139,7 @@
                 };
             });
 
-            member.orders.unshift({
+            const newOrder = {
                 orderId: `ORD-${Date.now()}`,
                 orderedAt: new Date().toLocaleString("ko-KR"),
                 items: orderItems,
@@ -1088,7 +1148,9 @@
                 finalPay,
                 earnedPoints,
                 tierName: tierAfter.name
-            });
+            };
+            member.orders.unshift(newOrder);
+            saveOrderToDb(member, newOrder, tierAfter.name);
 
             state.cart = [];
             useInput.value = "0";
@@ -1115,53 +1177,90 @@
             `).join("");
         }
 
-        function handleSignup(event) {
+        async function handleSignup(event) {
             event.preventDefault();
+            const form = event.target;
             const name = document.getElementById("signupNameInput").value.trim();
             const id = document.getElementById("signupIdInput").value.trim();
             const pw = document.getElementById("signupPwInput").value;
 
             if (!name || !id || !pw) return;
-
-            if (state.members.some(m => m.id === id)) {
-                showToast("중복된 아이디", "이미 등록된 아이디입니다. 다른 아이디를 입력해 주세요.", "warning");
+            if (!sb) {
+                showToast("DB 연결 실패", "Supabase 라이브러리를 불러오지 못했습니다. 새로고침 후 다시 시도해 주세요.", "warning");
                 return;
             }
 
-            const newMember = {
-                id,
-                password: pw,
+            const pwHash = await hashPw(pw);
+            const { error } = await sb.from("shop_members").insert({
+                login_id: id,
                 name,
+                password_hash: pwHash,
                 points: SIGNUP_BONUS_POINTS,
-                totalSpent: 0,
-                orders: []
-            };
+                grade: MEMBER_TIERS[0].name,
+                total_spent: 0
+            });
 
+            if (error) {
+                console.error("회원가입 DB 오류:", error);
+                if (error.code === "23505") {
+                    showToast("중복된 아이디", "이미 등록된 아이디입니다. 다른 아이디를 입력해 주세요.", "warning");
+                } else {
+                    showToast("회원가입 실패", `DB 저장 오류: ${error.message}`, "warning");
+                }
+                return;
+            }
+
+            const newMember = rowToMember({
+                login_id: id, password_hash: pwHash, name,
+                points: SIGNUP_BONUS_POINTS, total_spent: 0
+            }, []);
+
+            state.members = state.members.filter(m => m.id !== id);
             state.members.push(newMember);
             state.currentMemberId = id;
             saveState();
 
-            event.target.reset();
+            form.reset();
             renderAuthAndMypage();
             renderCheckoutSummary();
             showToast("회원가입 완료", `${name}님 환영합니다! 가입 축하 포인트 ${formatPt(SIGNUP_BONUS_POINTS)}가 즉시 지급되었습니다.`, "success");
         }
 
-        function handleLogin(event) {
+        async function handleLogin(event) {
             event.preventDefault();
+            const form = event.target;
             const id = document.getElementById("loginIdInput").value.trim();
             const pw = document.getElementById("loginPwInput").value;
 
-            const matched = state.members.find(m => m.id === id && m.password === pw);
-            if (!matched) {
+            if (!sb) {
+                showToast("DB 연결 실패", "Supabase 라이브러리를 불러오지 못했습니다. 새로고침 후 다시 시도해 주세요.", "warning");
+                return;
+            }
+
+            const pwHash = await hashPw(pw);
+            const { data: row, error } = await sb.from("shop_members")
+                .select("*").eq("login_id", id).eq("password_hash", pwHash).maybeSingle();
+
+            if (error) {
+                console.error("로그인 DB 오류:", error);
+                showToast("로그인 오류", `DB 조회 오류: ${error.message}`, "warning");
+                return;
+            }
+            if (!row) {
                 showToast("로그인 실패", "아이디 또는 비밀번호가 일치하지 않습니다. 신규 회원은 오른쪽에서 가입해 주세요.", "warning");
                 return;
             }
 
+            const { data: orderRows } = await sb.from("shop_orders")
+                .select("*").eq("login_id", id).order("created_at", { ascending: false });
+
+            const matched = rowToMember(row, orderRows);
+            state.members = state.members.filter(m => m.id !== id);
+            state.members.push(matched);
             state.currentMemberId = matched.id;
             saveState();
 
-            event.target.reset();
+            form.reset();
             renderAuthAndMypage();
             renderCheckoutSummary();
             showToast("로그인 성공", `${matched.name}님 반갑습니다!`, "success");
